@@ -17,6 +17,8 @@ class _MyAppState extends State<MyApp> {
 
   @override
   Widget build(BuildContext context) {
+    var isBlocked = cardReturnedList.length >= 2;
+
     return MaterialApp(
       home: Scaffold(
         body: Column(
@@ -25,15 +27,27 @@ class _MyAppState extends State<MyApp> {
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                CardWidget("1", onCardReturned: onCardReturned, key: ValueKey("1_$_counter")),
-                CardWidget("2", onCardReturned: onCardReturned, key: ValueKey("2_$_counter")),
+                CardWidget("1",
+                    isBlocked: isBlocked,
+                    onCardReturned: onCardReturned,
+                    key: ValueKey("1_$_counter")),
+                CardWidget("2",
+                    isBlocked: isBlocked,
+                    onCardReturned: onCardReturned,
+                    key: ValueKey("2_$_counter")),
               ],
             ),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                CardWidget("1", onCardReturned: onCardReturned, key: ValueKey("3_$_counter")),
-                CardWidget("2", onCardReturned: onCardReturned, key: ValueKey("4_$_counter")),
+                CardWidget("1",
+                    isBlocked: isBlocked,
+                    onCardReturned: onCardReturned,
+                    key: ValueKey("3_$_counter")),
+                CardWidget("2",
+                    isBlocked: isBlocked,
+                    onCardReturned: onCardReturned,
+                    key: ValueKey("4_$_counter")),
               ],
             )
           ],
@@ -46,10 +60,13 @@ class _MyAppState extends State<MyApp> {
     cardReturnedList.add(id);
     print(cardReturnedList);
     if (cardReturnedList.length >= 2) {
-      _counter ++;
-      setState(() {
-        cardReturnedList = [];
-      });
+      setState(() {});
+      Future.delayed(
+          Duration(seconds: 3),
+          () => setState(() {
+                _counter++;
+                cardReturnedList = [];
+              }));
     }
   }
 }
@@ -57,8 +74,11 @@ class _MyAppState extends State<MyApp> {
 class CardWidget extends StatefulWidget {
   final String value;
   final void Function(String id) onCardReturned;
+  final bool isBlocked;
 
-  const CardWidget(this.value, {Key? key, required this.onCardReturned}) : super(key: key);
+  const CardWidget(this.value,
+      {Key? key, required this.onCardReturned, required this.isBlocked})
+      : super(key: key);
 
   @override
   State<CardWidget> createState() => _CardWidgetState();
@@ -80,22 +100,26 @@ class _CardWidgetState extends State<CardWidget> {
       child: Container(
           decoration:
               BoxDecoration(border: Border.all(color: Colors.blueAccent)),
-          child: IconButton(onPressed: clickedCard, icon: Text(isShown ? widget.value : "?"))),
+          child: IconButton(
+              onPressed: clickedCard,
+              icon: Text(isShown ? widget.value : "?"))),
     );
   }
 
   void clickedCard() {
-    setState(() {
-      isShown = !isShown;
-      if (isShown) {
-        widget.onCardReturned(widget.value);
-      }
-      //
-      // if (isShown) {
-      //   isShown = false;
-      // } else {
-      //   isShown = true;
-      // }
-    });
+    if (!widget.isBlocked) {
+      setState(() {
+        isShown = !isShown;
+        if (isShown) {
+          widget.onCardReturned(widget.value);
+        }
+        //
+        // if (isShown) {
+        //   isShown = false;
+        // } else {
+        //   isShown = true;
+        // }
+      });
+    }
   }
 }
