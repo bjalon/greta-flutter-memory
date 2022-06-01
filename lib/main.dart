@@ -12,6 +12,9 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
+
+  var cardReturnedList = [];
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -22,15 +25,15 @@ class _MyAppState extends State<MyApp> {
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                CardWidget("1"),
-                CardWidget("2"),
+                CardWidget("1", onCardReturned: onCardReturned),
+                CardWidget("2", onCardReturned: onCardReturned),
               ],
             ),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                CardWidget("1"),
-                CardWidget("2"),
+                CardWidget("1", onCardReturned: onCardReturned),
+                CardWidget("2", onCardReturned: onCardReturned),
               ],
             )
           ],
@@ -38,12 +41,18 @@ class _MyAppState extends State<MyApp> {
       ),
     );
   }
+
+  void onCardReturned(String id) {
+    cardReturnedList.add(id);
+    print(cardReturnedList);
+  }
 }
 
 class CardWidget extends StatefulWidget {
   final String value;
+  final void Function(String id) onCardReturned;
 
-  const CardWidget(this.value, {Key? key}) : super(key: key);
+  const CardWidget(this.value, {Key? key, required this.onCardReturned}) : super(key: key);
 
   @override
   State<CardWidget> createState() => _CardWidgetState();
@@ -72,6 +81,9 @@ class _CardWidgetState extends State<CardWidget> {
   void clickedCard() {
     setState(() {
       isShown = !isShown;
+      if (isShown) {
+        widget.onCardReturned(widget.value);
+      }
       //
       // if (isShown) {
       //   isShown = false;
