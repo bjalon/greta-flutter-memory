@@ -12,8 +12,8 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-
   var cardReturnedList = [];
+  var _counter = 0;
 
   @override
   Widget build(BuildContext context) {
@@ -25,15 +25,15 @@ class _MyAppState extends State<MyApp> {
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                CardWidget("1", onCardReturned: onCardReturned),
-                CardWidget("2", onCardReturned: onCardReturned),
+                CardWidget("1", onCardReturned: onCardReturned, key: ValueKey("1_$_counter")),
+                CardWidget("2", onCardReturned: onCardReturned, key: ValueKey("2_$_counter")),
               ],
             ),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                CardWidget("1", onCardReturned: onCardReturned),
-                CardWidget("2", onCardReturned: onCardReturned),
+                CardWidget("1", onCardReturned: onCardReturned, key: ValueKey("3_$_counter")),
+                CardWidget("2", onCardReturned: onCardReturned, key: ValueKey("4_$_counter")),
               ],
             )
           ],
@@ -45,6 +45,12 @@ class _MyAppState extends State<MyApp> {
   void onCardReturned(String id) {
     cardReturnedList.add(id);
     print(cardReturnedList);
+    if (cardReturnedList.length >= 2) {
+      _counter ++;
+      setState(() {
+        cardReturnedList = [];
+      });
+    }
   }
 }
 
