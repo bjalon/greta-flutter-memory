@@ -1,11 +1,19 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 
 void main() {
-  runApp(const MyApp());
+  runApp(MyApp());
 }
 
 class MyApp extends StatefulWidget {
-  const MyApp({Key? key}) : super(key: key);
+  final cardCount = 20;
+  late List<int> orderList;
+
+  MyApp({Key? key}) : super(key: key) {
+    orderList = [for(var i=0; i < cardCount; i+=1) i];
+    orderList.shuffle();
+  }
 
   @override
   State<MyApp> createState() => _MyAppState();
@@ -19,39 +27,35 @@ class _MyAppState extends State<MyApp> {
   Widget build(BuildContext context) {
     var isBlocked = cardReturnedList.length >= 2;
 
+    final widgetList = [];
+
+    for (var i = 0; i < widget.cardCount; i ++) {
+      widgetList.add(CardWidget("${i%(widget.cardCount / 2)}",
+          isBlocked: isBlocked,
+          onCardReturned: onCardReturned,
+          key: ValueKey("${i}_$_counter")));
+    }
+
+    final rowCount = sqrt(widget.cardCount);
+    final Map<int, List<Widget>> columnChildren = {};
+    for (var i = 0; i < widget.cardCount; i ++) {
+      final rowIndex = (i ~/ rowCount).truncate();
+      if ((i % rowCount).truncate() == 0) {
+        print(i);
+        columnChildren[rowIndex] = [];
+      }
+      print("$i/$rowIndex/${(i % rowCount)}");
+      columnChildren[rowIndex]!.add(widgetList[widget.orderList[i]]);
+    }
+
+    final List<Widget> column = [];
+    for (var row in columnChildren.values) {
+      column.add(Row(children: row));
+    }
+
     return MaterialApp(
       home: Scaffold(
-        body: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                CardWidget("1",
-                    isBlocked: isBlocked,
-                    onCardReturned: onCardReturned,
-                    key: ValueKey("1_$_counter")),
-                CardWidget("2",
-                    isBlocked: isBlocked,
-                    onCardReturned: onCardReturned,
-                    key: ValueKey("2_$_counter")),
-              ],
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                CardWidget("1",
-                    isBlocked: isBlocked,
-                    onCardReturned: onCardReturned,
-                    key: ValueKey("3_$_counter")),
-                CardWidget("2",
-                    isBlocked: isBlocked,
-                    onCardReturned: onCardReturned,
-                    key: ValueKey("4_$_counter")),
-              ],
-            )
-          ],
-        ),
+        body: Column(children: column),
       ),
     );
   }
